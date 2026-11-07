@@ -769,21 +769,45 @@
 
     // 2. INICIALIZAÇÃO
     window.addEventListener('DOMContentLoaded', () => {
-      // Força a inserção das 3 Fases da Carine e do Portfólio Cooperkar no topo da coluna A Fazer
-      demands = demands.filter(d => !d.client.toLowerCase().includes('carine') && d.client !== 'Carnê');
-      
-      const demandasPrioritarias = [
+      // Garante que todas as 15 demandas oficiais estejam sincronizadas no CRM Kanban
+      const officialDemands = [
+        // Fases da Carine
         { id: 'd_carine_f1', client: 'Carine (Semana 1 - Fase 1)', title: 'Instagram Profissional + WhatsApp Business', type: 'fixo', priority: 'alta', status: 'todo' },
         { id: 'd_carine_f2', client: 'Carine (Semana 2 - Fase 2)', title: 'Catálogo Profissional + Site & Espaço Físico', type: 'fixo', priority: 'alta', status: 'todo' },
-        { id: 'd_carine_f3', client: 'Carine (Semana 3 - Fase 3)', title: 'Estratégia e ativação de Tráfego Pago', type: 'fixo', priority: 'alta', status: 'todo' }
+        { id: 'd_carine_f3', client: 'Carine (Semana 3 - Fase 3)', title: 'Estratégia e ativação de Tráfego Pago', type: 'fixo', priority: 'alta', status: 'todo' },
+        // Prospecção Ativa
+        { id: 'd_prospeccao', client: 'Prospecção Ativa (Diária)', title: 'Novos contatos, follow-ups de leads e propostas (Seg a Sex)', type: 'fixo', priority: 'alta', status: 'doing' },
+        // Cooperkar
+        { id: 'd_cooperkar_portf', client: 'Cooperkar', title: 'Fazer portfólio', type: 'fixo', priority: 'alta', status: 'todo' },
+        { id: 'd3', client: 'Cooperkar', title: 'Atualização do Ads & Google Meu Negócio', type: 'fixo', priority: 'alta', status: 'todo' },
+        { id: 'd4', client: 'Cooperkar', title: 'Relatório semanal do Ads', type: 'fixo', priority: 'alta', status: 'todo' },
+        // Lilian
+        { id: 'd1', client: 'Lilian', title: 'Enviar linha editorial (Envio 1/2)', type: 'fixo', priority: 'alta', status: 'todo' },
+        { id: 'd2', client: 'Lilian', title: 'Enviar linha editorial (Envio 2/2)', type: 'fixo', priority: 'alta', status: 'todo' },
+        // Óticas & Terencio
+        { id: 'd5', client: 'Ótica Vidal', title: 'Relatório semanal', type: 'fixo', priority: 'media', status: 'todo' },
+        { id: 'd6', client: 'Ótica Vision', title: 'Relatório semanal', type: 'fixo', priority: 'media', status: 'todo' },
+        { id: 'd7', client: 'Terencio Imóveis', title: 'Acompanhamento e relatório semanal', type: 'fixo', priority: 'media', status: 'todo' },
+        // Demandas Livres de Tráfego
+        { id: 'd8', client: 'Eliene', title: 'Ajuste do site', type: 'trafego', priority: 'alta', status: 'todo' },
+        { id: 'd9', client: 'Marcos Peres', title: 'Ajuste de relatório Google Ads', type: 'trafego', priority: 'media', status: 'todo' },
+        { id: 'd10', client: 'Cayan', title: 'Enviar / criar campanha Google Ads', type: 'trafego', priority: 'alta', status: 'todo' },
+        { id: 'd11', client: 'Gabi Lelis', title: 'Ajuste do site', type: 'trafego', priority: 'media', status: 'todo' },
+        { id: 'd12', client: 'Gabi Lelis', title: 'Criação do cardápio de Natal', type: 'trafego', priority: 'media', status: 'todo' },
+        { id: 'd13', client: 'Rayamara', title: 'Criar produto de recorrência e enviar', type: 'trafego', priority: 'alta', status: 'todo' },
+        { id: 'd14', client: 'Ana Cristina', title: 'Ajuste e envio de contrato', type: 'trafego', priority: 'media', status: 'todo' }
       ];
 
-      // Se a Cooperkar - Fazer portfólio não estiver no topo, adiciona também
-      if (!demands.some(d => d.client === 'Cooperkar' && d.title === 'Fazer portfólio')) {
-        demandasPrioritarias.unshift({ id: 'd_cooperkar_portf', client: 'Cooperkar', title: 'Fazer portfólio', type: 'fixo', priority: 'alta', status: 'todo' });
-      }
+      // Mescla com estados existentes sem perder nada
+      const savedDemands = JSON.parse(localStorage.getItem('minha_rotina_demands')) || [];
+      const statusMap = {};
+      savedDemands.forEach(d => { statusMap[d.id] = d.status; });
 
-      demands = [...demandasPrioritarias, ...demands];
+      demands = officialDemands.map(d => ({
+        ...d,
+        status: statusMap[d.id] || d.status
+      }));
+
       localStorage.setItem('minha_rotina_demands', JSON.stringify(demands));
 
       lucide.createIcons();
