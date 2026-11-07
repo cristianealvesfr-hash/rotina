@@ -190,6 +190,22 @@
             </div>
           </div>
 
+          <!-- Card Prospecção Diária de Clientes (Segunda a Sexta) - QUADRO DE CHECKS -->
+          <div class="bg-white rounded-2xl p-5 border border-pink-100 shadow-xs">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <i data-lucide="target" class="w-4 h-4 text-pink-600"></i>
+                Prospecção de Clientes
+              </h3>
+              <span class="text-xs text-pink-600 font-bold bg-pink-50 px-2 py-0.5 rounded-md border border-pink-100">Seg a Sex</span>
+            </div>
+            <p class="text-xs text-gray-500 mb-3.5">Meta diária: novos contatos, leads e propostas:</p>
+            
+            <div class="grid grid-cols-5 gap-1.5" id="prospectDaysTracker">
+              <!-- Botoes de Segunda a Sexta -->
+            </div>
+          </div>
+
           <!-- Card de Leitura RD Dopamina (15 minutos) -->
           <div class="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs">
             <div class="flex items-center justify-between mb-2">
@@ -778,6 +794,7 @@
       renderGymTracker();
       renderTherapyTracker();
       renderChurchTracker();
+      renderProspectTracker();
       renderReadingStatus();
       renderKanban();
       loadStudyNotes();
@@ -1020,6 +1037,41 @@
       churchDays[id] = !churchDays[id];
       localStorage.setItem('minha_rotina_church', JSON.stringify(churchDays));
       renderChurchTracker();
+    }
+
+    // Tracker de Prospecção Diária (Segunda a Sexta) - IGUAL AO DA ACADEMIA
+    let prospectDays = JSON.parse(localStorage.getItem('minha_rotina_prospect')) || { seg: false, ter: false, qua: false, qui: false, sex: false };
+
+    function renderProspectTracker() {
+      const container = document.getElementById('prospectDaysTracker');
+      if (!container) return;
+      const days = [
+        { id: 'seg', label: 'Seg' },
+        { id: 'ter', label: 'Ter' },
+        { id: 'qua', label: 'Qua' },
+        { id: 'qui', label: 'Qui' },
+        { id: 'sex', label: 'Sex' }
+      ];
+
+      container.innerHTML = days.map(d => {
+        const checked = prospectDays[d.id];
+        return `
+          <button onclick="toggleProspectDay('${d.id}')" class="p-2 rounded-xl text-center border transition ${
+            checked 
+              ? 'bg-pink-600 text-white border-pink-600 font-bold shadow-xs' 
+              : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 font-medium'
+          }">
+            <div class="text-xs uppercase">${d.label}</div>
+            <div class="text-[10px] mt-0.5">${checked ? '✓ Feito' : 'Prosp.'}</div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function toggleProspectDay(id) {
+      prospectDays[id] = !prospectDays[id];
+      localStorage.setItem('minha_rotina_prospect', JSON.stringify(prospectDays));
+      renderProspectTracker();
     }
 
     // Leitura Anti-Dopamina
