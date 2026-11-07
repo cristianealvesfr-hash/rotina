@@ -17,11 +17,12 @@
       font-family: 'Open Sans', Arial, sans-serif;
       background-color: #FAFAFB;
       color: #1F2937;
+      -webkit-tap-highlight-color: transparent;
     }
     /* Estilo de scroll suave e discreto */
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
     }
     ::-webkit-scrollbar-track {
       background: #F1F1F4;
@@ -29,9 +30,6 @@
     ::-webkit-scrollbar-thumb {
       background: #E4C1D9;
       border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #D594C5;
     }
     .badge-rose {
       background-color: #FDF2F4;
@@ -42,6 +40,15 @@
       background-color: #F5F3FF;
       color: #6D28D9;
       border: 1px solid #DDD6FE;
+    }
+    /* Otimizações de toque para celular */
+    @media (max-width: 640px) {
+      button, input, select {
+        min-height: 40px;
+      }
+      .kanban-column {
+        min-width: 280px;
+      }
     }
   </style>
 </head>
@@ -259,11 +266,11 @@
         </div>
       </div>
 
-      <!-- KANBAN BOARD -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- KANBAN BOARD (Rolagem horizontal fluida no mobile) -->
+      <div class="flex lg:grid lg:grid-cols-4 gap-4 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory">
         
         <!-- Coluna 1: A Fazer -->
-        <div class="bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col">
+        <div class="kanban-column bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col shrink-0 w-[85vw] sm:w-[320px] lg:w-auto snap-center shadow-xs">
           <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span>
@@ -277,7 +284,7 @@
         </div>
 
         <!-- Coluna 2: Em Produção -->
-        <div class="bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col">
+        <div class="kanban-column bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col shrink-0 w-[85vw] sm:w-[320px] lg:w-auto snap-center shadow-xs">
           <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
@@ -291,7 +298,7 @@
         </div>
 
         <!-- Coluna 3: Aguardando Cliente -->
-        <div class="bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col">
+        <div class="kanban-column bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col shrink-0 w-[85vw] sm:w-[320px] lg:w-auto snap-center shadow-xs">
           <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
@@ -305,7 +312,7 @@
         </div>
 
         <!-- Coluna 4: Concluído -->
-        <div class="bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col">
+        <div class="kanban-column bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col shrink-0 w-[85vw] sm:w-[320px] lg:w-auto snap-center shadow-xs">
           <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
