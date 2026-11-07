@@ -554,7 +554,7 @@
           </div>
         </div>
 
-        <!-- Os 3 Cursos com Checklist de Aulas -->
+        <!-- Os 3 Cursos com Lista Interativa de Aulas -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
           
           <!-- Curso 1: Patrícia Roberta -->
@@ -564,17 +564,26 @@
                 <h3 class="font-bold text-gray-800 text-sm">Curso Patrícia Roberta</h3>
                 <i data-lucide="book-marked" class="w-4 h-4 text-pink-500"></i>
               </div>
-              <p class="text-xs text-gray-500 mb-4">Aulas e metodologias da mentoria.</p>
-              <div class="space-y-2 text-xs">
-                <label class="text-gray-600 font-medium">Módulo / Aula Atual:</label>
-                <input type="text" id="course_patricia_input" placeholder="Ex: Módulo 3 - Aula 2" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-pink-300 outline-none" oninput="saveStudyNote('patricia', this.value)">
+              <p class="text-xs text-gray-500 mb-3">Aulas e metodologias da mentoria.</p>
+              
+              <!-- Input para adicionar aula assistida -->
+              <div class="flex items-center gap-1.5 mb-3">
+                <input type="text" id="input_aula_patricia" placeholder="Digitar nova aula concluída..." class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-pink-300">
+                <button onclick="addCourseLesson('patricia')" class="p-2 bg-pink-500 hover:bg-pink-600 text-white rounded-xl text-xs font-bold transition shadow-xs" title="Adicionar aula">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                </button>
+              </div>
+
+              <!-- Lista de Aulas Adicionadas -->
+              <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1" id="list_lessons_patricia">
+                <!-- Gerado dinamicamente -->
               </div>
             </div>
             
             <div class="pt-4 mt-4 border-t border-pink-200/60">
               <button onclick="toggleCourseDone('patricia')" id="btn_patricia" class="w-full py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border bg-white text-gray-700 border-gray-300 hover:border-pink-400 shadow-2xs">
                 <span id="check_icon_patricia" class="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center text-[10px]"></span>
-                <span id="check_text_patricia">Marcar Estudo Concluído</span>
+                <span id="check_text_patricia">Marcar Estudo de Hoje Concluído</span>
               </button>
             </div>
           </div>
@@ -586,17 +595,26 @@
                 <h3 class="font-bold text-gray-800 text-sm">Curso Claude</h3>
                 <i data-lucide="cpu" class="w-4 h-4 text-purple-600"></i>
               </div>
-              <p class="text-xs text-gray-500 mb-4">Engenharia de prompt, automações e IA.</p>
-              <div class="space-y-2 text-xs">
-                <label class="text-gray-600 font-medium">Módulo / Aula Atual:</label>
-                <input type="text" id="course_claude_input" placeholder="Ex: Módulo 2 - Prompts avançados" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-purple-300 outline-none" oninput="saveStudyNote('claude', this.value)">
+              <p class="text-xs text-gray-500 mb-3">Engenharia de prompt, automações e IA.</p>
+              
+              <!-- Input para adicionar aula assistida -->
+              <div class="flex items-center gap-1.5 mb-3">
+                <input type="text" id="input_aula_claude" placeholder="Digitar nova aula concluída..." class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-purple-300">
+                <button onclick="addCourseLesson('claude')" class="p-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition shadow-xs" title="Adicionar aula">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                </button>
+              </div>
+
+              <!-- Lista de Aulas Adicionadas -->
+              <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1" id="list_lessons_claude">
+                <!-- Gerado dinamicamente -->
               </div>
             </div>
 
             <div class="pt-4 mt-4 border-t border-purple-200/60">
               <button onclick="toggleCourseDone('claude')" id="btn_claude" class="w-full py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border bg-white text-gray-700 border-gray-300 hover:border-purple-400 shadow-2xs">
                 <span id="check_icon_claude" class="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center text-[10px]"></span>
-                <span id="check_text_claude">Marcar Estudo Concluído</span>
+                <span id="check_text_claude">Marcar Estudo de Hoje Concluído</span>
               </button>
             </div>
           </div>
@@ -608,17 +626,26 @@
                 <h3 class="font-bold text-gray-800 text-sm">Descomplicando Sites</h3>
                 <i data-lucide="layout" class="w-4 h-4 text-pink-500"></i>
               </div>
-              <p class="text-xs text-gray-500 mb-4">Criação, WordPress, páginas e layout.</p>
-              <div class="space-y-2 text-xs">
-                <label class="text-gray-600 font-medium">Módulo / Aula Atual:</label>
-                <input type="text" id="course_site_input" placeholder="Ex: Ajuste de Elementor e Landing Page" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-pink-300 outline-none" oninput="saveStudyNote('site', this.value)">
+              <p class="text-xs text-gray-500 mb-3">Criação, WordPress, páginas e layout.</p>
+              
+              <!-- Input para adicionar aula assistida -->
+              <div class="flex items-center gap-1.5 mb-3">
+                <input type="text" id="input_aula_site" placeholder="Digitar nova aula concluída..." class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-pink-300">
+                <button onclick="addCourseLesson('site')" class="p-2 bg-pink-500 hover:bg-pink-600 text-white rounded-xl text-xs font-bold transition shadow-xs" title="Adicionar aula">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                </button>
+              </div>
+
+              <!-- Lista de Aulas Adicionadas -->
+              <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1" id="list_lessons_site">
+                <!-- Gerado dinamicamente -->
               </div>
             </div>
 
             <div class="pt-4 mt-4 border-t border-pink-200/60">
               <button onclick="toggleCourseDone('site')" id="btn_site" class="w-full py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border bg-white text-gray-700 border-gray-300 hover:border-pink-400 shadow-2xs">
                 <span id="check_icon_site" class="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center text-[10px]"></span>
-                <span id="check_text_site">Marcar Estudo Concluído</span>
+                <span id="check_text_site">Marcar Estudo de Hoje Concluído</span>
               </button>
             </div>
           </div>
@@ -1273,19 +1300,57 @@
       });
     }
 
-    function saveStudyNote(course, value) {
-      localStorage.setItem(`estudo_note_${course}`, value);
+    // Gerenciador Interativo de Aulas por Curso
+    let courseLessons = JSON.parse(localStorage.getItem('minha_rotina_course_lessons')) || {
+      patricia: ['Módulo 1 - Boas-vindas', 'Módulo 2 - Posicionamento'],
+      claude: ['Módulo 1 - Fundamentos do Claude'],
+      site: ['Módulo 1 - Domínio e Hospedagem']
+    };
+
+    function addCourseLesson(course) {
+      const input = document.getElementById(`input_aula_${course}`);
+      if (!input || !input.value.trim()) return;
+      const lessonTitle = input.value.trim();
+      courseLessons[course].push(lessonTitle);
+      localStorage.setItem('minha_rotina_course_lessons', JSON.stringify(courseLessons));
+      input.value = '';
+      renderCourseLessons();
+    }
+
+    function removeCourseLesson(course, index) {
+      courseLessons[course].splice(index, 1);
+      localStorage.setItem('minha_rotina_course_lessons', JSON.stringify(courseLessons));
+      renderCourseLessons();
+    }
+
+    function renderCourseLessons() {
+      ['patricia', 'claude', 'site'].forEach(c => {
+        const container = document.getElementById(`list_lessons_${c}`);
+        if (!container) return;
+        const list = courseLessons[c] || [];
+        if (list.length === 0) {
+          container.innerHTML = `<p class="text-[11px] text-gray-400 italic py-1">Nenhuma aula registrada ainda.</p>`;
+          return;
+        }
+
+        container.innerHTML = list.map((item, idx) => `
+          <div class="flex items-center justify-between p-2 rounded-xl bg-white border border-gray-200/80 shadow-2xs group">
+            <span class="text-xs text-gray-700 font-medium truncate flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-pink-500"></span>
+              ${item}
+            </span>
+            <button onclick="removeCourseLesson('${c}', ${idx})" title="Excluir aula" class="text-gray-300 hover:text-red-500 text-xs px-1 transition">
+              ✕
+            </button>
+          </div>
+        `).join('');
+      });
+      lucide.createIcons();
     }
 
     function loadStudyNotes() {
-      ['patricia', 'claude', 'site'].forEach(c => {
-        const val = localStorage.getItem(`estudo_note_${c}`);
-        if (val) {
-          const input = document.getElementById(`course_${c}_input`);
-          if (input) input.value = val;
-        }
-      });
       renderCourseChecks();
+      renderCourseLessons();
     }
 
     // Timer de Estudos (2h)
