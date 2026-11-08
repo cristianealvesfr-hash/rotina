@@ -247,99 +247,7 @@
 
     </div>
 
-    <!-- ==================== ABA 2: CRM DE CLIENTES & DEMANDAS ==================== -->
-    <div id="view-crm" class="tab-content hidden space-y-6">
-      
-      <!-- Topo do CRM com Filtros e Novo Card -->
-      <div class="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-            <i data-lucide="kanban" class="w-5 h-5 text-purple-600"></i>
-            CRM de Demandas de Clientes
-          </h2>
-          <p class="text-xs text-gray-500">Organize clientes fixos semanais e clientes de demanda livre de tráfego.</p>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-3">
-          <!-- Filtro -->
-          <div class="flex items-center bg-gray-100 p-1 rounded-xl text-xs font-medium">
-            <button onclick="filterCrm('todos')" id="filter-todos" class="crm-filter-btn px-3 py-1 rounded-lg bg-white shadow-xs text-gray-800">Todos</button>
-            <button onclick="filterCrm('fixo')" id="filter-fixo" class="crm-filter-btn px-3 py-1 rounded-lg text-gray-500 hover:text-gray-800">Fixos</button>
-            <button onclick="filterCrm('trafego')" id="filter-trafego" class="crm-filter-btn px-3 py-1 rounded-lg text-gray-500 hover:text-gray-800">Tráfego / Avulsos</button>
-          </div>
-
-          <!-- Botão Nova Demanda -->
-          <button onclick="openModalNewDemand()" class="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs font-semibold rounded-xl shadow-xs hover:opacity-95 transition flex items-center gap-1.5">
-            <i data-lucide="plus" class="w-4 h-4"></i>
-            Nova Demanda
-          </button>
-        </div>
-      </div>
-
-      <!-- KANBAN BOARD (Rolagem horizontal fluida no mobile) -->
-      <div class="flex lg:grid lg:grid-cols-4 gap-4 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory">
-        
-        <!-- Coluna 1: A Fazer -->
-        <div class="kanban-column bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col shrink-0 w-[85vw] sm:w-[320px] lg:w-auto snap-center shadow-xs">
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">A Fazer</h3>
-            </div>
-            <span id="count-todo" class="text-xs bg-gray-100 text-gray-600 font-bold px-2 py-0.5 rounded-full">0</span>
-          </div>
-          <div id="col-todo" class="space-y-3 flex-1 min-h-[300px]">
-            <!-- Cards -->
-          </div>
-        </div>
-
-        <!-- Coluna 2: Em Produção -->
-        <div class="kanban-column bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col shrink-0 w-[85vw] sm:w-[320px] lg:w-auto snap-center shadow-xs">
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">Em Produção</h3>
-            </div>
-            <span id="count-doing" class="text-xs bg-purple-50 text-purple-700 font-bold px-2 py-0.5 rounded-full">0</span>
-          </div>
-          <div id="col-doing" class="space-y-3 flex-1 min-h-[300px]">
-            <!-- Cards -->
-          </div>
-        </div>
-
-        <!-- Coluna 3: Aguardando Cliente -->
-        <div class="kanban-column bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col shrink-0 w-[85vw] sm:w-[320px] lg:w-auto snap-center shadow-xs">
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">Aguardando Aprovação</h3>
-            </div>
-            <span id="count-waiting" class="text-xs bg-amber-50 text-amber-700 font-bold px-2 py-0.5 rounded-full">0</span>
-          </div>
-          <div id="col-waiting" class="space-y-3 flex-1 min-h-[300px]">
-            <!-- Cards -->
-          </div>
-        </div>
-
-        <!-- Coluna 4: Concluído -->
-        <div class="kanban-column bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col shrink-0 w-[85vw] sm:w-[320px] lg:w-auto snap-center shadow-xs">
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">Concluído</h3>
-            </div>
-            <span id="count-done" class="text-xs bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full">0</span>
-          </div>
-          <div id="col-done" class="space-y-3 flex-1 min-h-[300px]">
-            <!-- Cards -->
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- ==================== ABA 3: GRADE SEMANAL FIXA ==================== -->
+    <!-- ==================== ABA 2: GRADE SEMANAL FIXA ==================== -->
     <div id="view-semana" class="tab-content hidden space-y-6">
       
       <div class="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs">
@@ -550,6 +458,98 @@
               <span><strong>Descanso Total:</strong> Recarregar as energias para começar a segunda em paz.</span>
             </li>
           </ul>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ==================== ABA 3: CRM DE CLIENTES & DEMANDAS ==================== -->
+    <div id="view-crm" class="tab-content hidden space-y-6">
+      
+      <!-- Topo do CRM com Filtros e Novo Card -->
+      <div class="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <i data-lucide="kanban" class="w-5 h-5 text-purple-600"></i>
+            CRM de Demandas de Clientes
+          </h2>
+          <p class="text-xs text-gray-500">Organize clientes fixos semanais e clientes de demanda livre de tráfego.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Filtro -->
+          <div class="flex items-center bg-gray-100 p-1 rounded-xl text-xs font-medium">
+            <button onclick="filterCrm('todos')" id="filter-todos" class="crm-filter-btn px-3 py-1 rounded-lg bg-white shadow-xs text-gray-800">Todos</button>
+            <button onclick="filterCrm('fixo')" id="filter-fixo" class="crm-filter-btn px-3 py-1 rounded-lg text-gray-500 hover:text-gray-800">Fixos</button>
+            <button onclick="filterCrm('trafego')" id="filter-trafego" class="crm-filter-btn px-3 py-1 rounded-lg text-gray-500 hover:text-gray-800">Tráfego / Avulsos</button>
+          </div>
+
+          <!-- Botão Nova Demanda -->
+          <button onclick="openModalNewDemand()" class="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs font-semibold rounded-xl shadow-xs hover:opacity-95 transition flex items-center gap-1.5">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            Nova Demanda
+          </button>
+        </div>
+      </div>
+
+      <!-- KANBAN BOARD (Rolagem horizontal fluida no mobile) -->
+      <div class="flex lg:grid lg:grid-cols-4 gap-4 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory">
+        
+        <!-- Coluna 1: A Fazer -->
+        <div class="kanban-column bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col shrink-0 w-[85vw] sm:w-[320px] lg:w-auto snap-center shadow-xs">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">A Fazer</h3>
+            </div>
+            <span id="count-todo" class="text-xs bg-gray-100 text-gray-600 font-bold px-2 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="col-todo" class="space-y-3 flex-1 min-h-[300px]">
+            <!-- Cards -->
+          </div>
+        </div>
+
+        <!-- Coluna 2: Em Produção -->
+        <div class="kanban-column bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col shrink-0 w-[85vw] sm:w-[320px] lg:w-auto snap-center shadow-xs">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">Em Produção</h3>
+            </div>
+            <span id="count-doing" class="text-xs bg-purple-50 text-purple-700 font-bold px-2 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="col-doing" class="space-y-3 flex-1 min-h-[300px]">
+            <!-- Cards -->
+          </div>
+        </div>
+
+        <!-- Coluna 3: Aguardando Cliente -->
+        <div class="kanban-column bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col shrink-0 w-[85vw] sm:w-[320px] lg:w-auto snap-center shadow-xs">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">Aguardando Aprovação</h3>
+            </div>
+            <span id="count-waiting" class="text-xs bg-amber-50 text-amber-700 font-bold px-2 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="col-waiting" class="space-y-3 flex-1 min-h-[300px]">
+            <!-- Cards -->
+          </div>
+        </div>
+
+        <!-- Coluna 4: Concluído -->
+        <div class="kanban-column bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col shrink-0 w-[85vw] sm:w-[320px] lg:w-auto snap-center shadow-xs">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">Concluído</h3>
+            </div>
+            <span id="count-done" class="text-xs bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="col-done" class="space-y-3 flex-1 min-h-[300px]">
+            <!-- Cards -->
+          </div>
         </div>
 
       </div>

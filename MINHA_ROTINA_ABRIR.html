@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Pessoal de Organização e Gestão de Rotina</title>
+  <!-- Metatags e Ícones Oficiais para Celular (Android, iPhone e PWA) -->
+  <meta name="theme-color" content="#F472B6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Minha Rotina">
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <!-- Tailwind CSS CDN para estilização rápida e limpa -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Open Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Open Sans', Arial, sans-serif;
+      background-color: #FAFAFB;
+      color: #1F2937;
+      -webkit-tap-highlight-color: transparent;
+    }
+    /* Estilo de scroll suave e discreto */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F1F4;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #E4C1D9;
+      border-radius: 9999px;
+    }
+    .badge-rose {
+      background-color: #FDF2F4;
+      color: #BE185D;
+      border: 1px solid #FBCFE8;
+    }
+    .badge-lilas {
+      background-color: #F5F3FF;
+      color: #6D28D9;
+      border: 1px solid #DDD6FE;
+    }
+    /* Otimizações de toque para celular */
+    @media (max-width: 640px) {
+      button, input, select {
+        min-height: 40px;
+      }
+      .kanban-column {
+        min-width: 280px;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-pink-100 selection:text-pink-900">
+
+  <!-- CABEÇALHO SUPERIOR ELEGANTE -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-400 via-rose-300 to-purple-400 flex items-center justify-center text-white shadow-sm shadow-pink-200">
+          <i data-lucide="sparkles" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight text-gray-900">Meu Painel de Gestão & Rotina</h1>
+          <p class="text-xs text-gray-500 font-medium">Clareza mental, prioridades do dia e CRM integrado</p>
+        </div>
+      </div>
+
+      <!-- Relógio ao vivo, data e indicador do dia -->
+      <div class="flex items-center gap-4">
+        <div class="text-right">
+          <div id="liveClock" class="text-base font-semibold text-gray-800 tracking-wide">00:00:00</div>
+          <div id="liveDate" class="text-xs text-gray-500 capitalize">Hoje</div>
+        </div>
+        <div class="h-8 w-px bg-gray-200"></div>
+        <div class="flex items-center gap-2 bg-pink-50 border border-pink-200/60 px-3 py-1.5 rounded-full text-xs font-medium text-pink-800">
+          <span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span>
+          <span id="dayProgressPercent">0% concluído hoje</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABAS DE NAVEGAÇÃO -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-1 border-t border-gray-100 overflow-x-auto">
+      <button onclick="switchTab('hoje')" id="tab-hoje" class="tab-btn px-4 py-3 text-xs sm:text-sm font-semibold border-b-2 border-pink-500 text-pink-600 flex items-center gap-2 whitespace-nowrap">
+        <i data-lucide="clock" class="w-4 h-4"></i>
+        Visão de Hoje
+      </button>
+      <button onclick="switchTab('semana')" id="tab-semana" class="tab-btn px-4 py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300 flex items-center gap-2 whitespace-nowrap">
+        <i data-lucide="calendar-days" class="w-4 h-4"></i>
+        Grade Semanal Fixa
+      </button>
+      <button onclick="switchTab('crm')" id="tab-crm" class="tab-btn px-4 py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300 flex items-center gap-2 whitespace-nowrap">
+        <i data-lucide="kanban" class="w-4 h-4"></i>
+        CRM de Clientes & Demandas
+      </button>
+      <button onclick="switchTab('estudos')" id="tab-estudos" class="tab-btn px-4 py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300 flex items-center gap-2 whitespace-nowrap">
+        <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+        Estudos 2h & Hábitos
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1">
+
+    <!-- ==================== ABA 1: VISÃO DE HOJE ==================== -->
+    <div id="view-hoje" class="tab-content space-y-6">
+      
+      <!-- Banner de foco rápido -->
+      <div class="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold badge-lilas mb-1.5">
+            <i data-lucide="focus" class="w-3.5 h-3.5"></i> Foco Diário
+          </span>
+          <h2 class="text-xl font-bold text-gray-800" id="todayGreeting">Planejamento do Dia</h2>
+          <p class="text-sm text-gray-600 mt-0.5">Siga os blocos de horário para não sobrecarregar sua mente. Um passo de cada vez.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="resetDayTasks()" class="px-3.5 py-2 text-xs font-medium text-gray-600 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl transition flex items-center gap-1.5">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Resetar checks de hoje
+          </button>
+        </div>
+      </div>
+
+      <!-- Grade dos Blocos Horários -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Coluna Esquerda: Blocos Horários Principais (2 cols) -->
+        <div class="lg:col-span-2 space-y-3.5" id="scheduleContainer">
+          <!-- Blocos gerados via JS com estados salvos -->
+        </div>
+
+        <!-- Coluna Direita: Quick Wins & Foco Prioritário -->
+        <div class="space-y-6">
+          
+          <!-- Card de Prioridades Máximas de Clientes Fixos -->
+          <div class="bg-white rounded-2xl p-5 border border-pink-100 shadow-xs">
+            <div class="flex items-center justify-between mb-3.5">
+              <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span>
+                Clientes Fixos do Dia
+              </h3>
+              <span class="text-xs text-pink-600 font-semibold bg-pink-50 px-2 py-0.5 rounded-md border border-pink-100">Prioridade Alta</span>
+            </div>
+            <div id="todayFixedClients" class="space-y-2.5 text-xs">
+              <!-- Preenchido dinamicamente de acordo com o dia da semana -->
+            </div>
+          </div>
+
+          <!-- Card Academia 14:00 & Bem-estar -->
+          <div class="bg-white rounded-2xl p-5 border border-purple-100 shadow-xs">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <i data-lucide="dumbbell" class="w-4 h-4 text-purple-600"></i>
+                Meta Academia (14:00)
+              </h3>
+              <span class="text-xs text-purple-600 font-semibold bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100">Mín. 3x na semana</span>
+            </div>
+            <p class="text-xs text-gray-500 mb-3.5">Segunda-feira sem treino. Terça a Sexta às 14:00 pontual!</p>
+            
+            <div class="grid grid-cols-5 gap-1.5" id="gymDaysTracker">
+              <!-- Botoes de Terça a Sábado -->
+            </div>
+          </div>
+
+          <!-- Card Terapia RD Dopamina (Terça e Quinta) - IGUAL AO DA ACADEMIA -->
+          <div class="bg-white rounded-2xl p-5 border border-pink-100 shadow-xs">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <i data-lucide="heart" class="w-4 h-4 text-pink-600"></i>
+                Terapia RD Dopamina
+              </h3>
+              <span class="text-xs text-pink-600 font-semibold bg-pink-50 px-2 py-0.5 rounded-md border border-pink-100">2x na semana</span>
+            </div>
+            <p class="text-xs text-gray-500 mb-3.5">Dias fixos de Terapia e regulação de dopamina:</p>
+            
+            <div class="grid grid-cols-2 gap-2" id="therapyDaysTracker">
+              <!-- Botoes de Terça e Quinta -->
+            </div>
+          </div>
+
+          <!-- Card Igreja & Vida Espiritual (Segunda GAD e Domingo Culto) - IGUAL AO DA ACADEMIA -->
+          <div class="bg-white rounded-2xl p-5 border border-purple-200 shadow-xs">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <i data-lucide="church" class="w-4 h-4 text-purple-600"></i>
+                Igreja & Vida Espiritual
+              </h3>
+              <span class="text-xs text-purple-700 font-bold bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200">Muito Importante</span>
+            </div>
+            <p class="text-xs text-gray-500 mb-3.5">Compromissos sagrados fixos da semana:</p>
+            
+            <div class="grid grid-cols-2 gap-2" id="churchDaysTracker">
+              <!-- Botoes de Segunda GAD e Domingo Culto -->
+            </div>
+          </div>
+
+          <!-- Card Prospecção Diária de Clientes (Segunda a Sexta) - QUADRO DE CHECKS -->
+          <div class="bg-white rounded-2xl p-5 border border-pink-100 shadow-xs">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <i data-lucide="target" class="w-4 h-4 text-pink-600"></i>
+                Prospecção de Clientes
+              </h3>
+              <span class="text-xs text-pink-600 font-bold bg-pink-50 px-2 py-0.5 rounded-md border border-pink-100">Seg a Sex</span>
+            </div>
+            <p class="text-xs text-gray-500 mb-3.5">Meta diária: novos contatos, leads e propostas:</p>
+            
+            <div class="grid grid-cols-5 gap-1.5" id="prospectDaysTracker">
+              <!-- Botoes de Segunda a Sexta -->
+            </div>
+          </div>
+
+          <!-- Card de Leitura RD Dopamina (15 minutos) -->
+          <div class="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <i data-lucide="book-open" class="w-4 h-4 text-rose-500"></i>
+                Leitura Anti-Dopamina
+              </h3>
+              <span class="text-xs text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md">15 minutos</span>
+            </div>
+            <p class="text-xs text-gray-500 mb-3">Micropasso diário para vencer a ansiedade e construir foco sustentável.</p>
+            <div class="flex items-center justify-between bg-gray-50 p-3 rounded-xl border border-gray-100">
+              <div class="text-xs font-semibold text-gray-700" id="readingStatusText">Pendente hoje</div>
+              <button onclick="toggleReading()" id="readingBtn" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-pink-500 hover:bg-pink-600 text-white transition shadow-xs">
+                Marcar como Lido
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ==================== ABA 2: GRADE SEMANAL FIXA ==================== -->
+    <div id="view-semana" class="tab-content hidden space-y-6">
+      
+      <div class="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs">
+        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+          <i data-lucide="calendar" class="w-5 h-5 text-pink-500"></i>
+          Mapa Semanal Estruturado (Segunda a Domingo)
+        </h2>
+        <p class="text-xs text-gray-500">Dias específicos definidos para clientes prioritários, estudos, academia e compromissos fixos.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        
+        <!-- SEGUNDA -->
+        <div class="bg-white rounded-2xl border-2 border-purple-200 p-5 shadow-xs relative overflow-hidden">
+          <div class="w-2 h-full absolute left-0 top-0 bg-purple-500"></div>
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-gray-800">Segunda-feira</h3>
+            <span class="badge-rose text-xs px-2.5 py-0.5 rounded-full font-medium">Sem Academia</span>
+          </div>
+          <ul class="space-y-2.5 text-xs text-gray-600">
+            <li class="flex items-start gap-2 p-2 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 font-semibold">
+              <i data-lucide="church" class="w-4 h-4 text-purple-600 mt-0.5 shrink-0"></i>
+              <span><strong>MUITO IMPORTANTE (19:00):</strong> Encontro GAD da IGREJA (Compromisso Espiritual Fixo).</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-pink-500 mt-0.5 shrink-0"></i>
+              <span><strong>Lilian (1/2):</strong> Envio de linha editorial da semana.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-pink-500 mt-0.5 shrink-0"></i>
+              <span><strong>Carine:</strong> Acompanhamento Fase 1 (Instagram Profissional + WhatsApp).</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-purple-500 mt-0.5 shrink-0"></i>
+              <span><strong>Estudos (2 Horas):</strong> Curso Patrícia Roberta.</span>
+            </li>
+            <li class="flex items-start gap-2 p-1.5 rounded-lg bg-pink-50/60 border border-pink-200 text-pink-900 font-semibold">
+              <i data-lucide="target" class="w-3.5 h-3.5 text-pink-600 mt-0.5 shrink-0"></i>
+              <span><strong>Prospecção Diária:</strong> Contato com novos leads e empresas.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- TERÇA -->
+        <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-xs relative overflow-hidden">
+          <div class="w-1.5 h-full absolute left-0 top-0 bg-purple-400"></div>
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-gray-800">Terça-feira</h3>
+            <span class="badge-lilas text-xs px-2.5 py-0.5 rounded-full font-medium">Academia 14h</span>
+          </div>
+          <ul class="space-y-2.5 text-xs text-gray-600">
+            <li class="flex items-start gap-2 p-2 rounded-xl bg-purple-50/70 border border-purple-200 text-purple-900 font-semibold">
+              <i data-lucide="sparkles" class="w-4 h-4 text-purple-600 mt-0.5 shrink-0"></i>
+              <span><strong>Terapia RD Dopamina & Leitura:</strong> Sessão / foco no quadro de recuperação de dopamina.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-pink-500 mt-0.5 shrink-0"></i>
+              <span><strong>Cooperkar (1/2):</strong> Atualização do Google Ads & Google Meu Negócio.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-pink-500 mt-0.5 shrink-0"></i>
+              <span><strong>Ótica Vidal & Ótica Vision:</strong> Relatórios semanais de tráfego.</span>
+            </li>
+            <li class="flex items-start gap-2 p-1.5 rounded-lg bg-blue-50/70 border border-blue-200 text-blue-900 font-medium">
+              <i data-lucide="briefcase" class="w-3.5 h-3.5 text-blue-600 mt-0.5 shrink-0"></i>
+              <span><strong>Demandas Livres (Eliene & Marcos Peres):</strong> Ajuste do site (Eliene) e relatório Ads (Marcos).</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-purple-500 mt-0.5 shrink-0"></i>
+              <span><strong>Estudos (2 Horas):</strong> Descomplicando Sites.</span>
+            </li>
+            <li class="flex items-start gap-2 p-1.5 rounded-lg bg-pink-50/60 border border-pink-200 text-pink-900 font-semibold">
+              <i data-lucide="target" class="w-3.5 h-3.5 text-pink-600 mt-0.5 shrink-0"></i>
+              <span><strong>Prospecção Diária:</strong> Abordagens e acompanhamento de propostas.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- QUARTA -->
+        <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-xs relative overflow-hidden">
+          <div class="w-1.5 h-full absolute left-0 top-0 bg-pink-400"></div>
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-gray-800">Quarta-feira</h3>
+            <span class="badge-lilas text-xs px-2.5 py-0.5 rounded-full font-medium">Academia 14h</span>
+          </div>
+          <ul class="space-y-2.5 text-xs text-gray-600">
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-pink-500 mt-0.5 shrink-0"></i>
+              <span><strong>Lilian (2/2):</strong> Segundo envio / alinhamento linha editorial.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-pink-500 mt-0.5 shrink-0"></i>
+              <span><strong>Terencio Imóveis:</strong> Relatório / alinhamento semanal.</span>
+            </li>
+            <li class="flex items-start gap-2 p-1.5 rounded-lg bg-blue-50/70 border border-blue-200 text-blue-900 font-medium">
+              <i data-lucide="briefcase" class="w-3.5 h-3.5 text-blue-600 mt-0.5 shrink-0"></i>
+              <span><strong>Demanda Livre (Cayan):</strong> Criação e ativação da campanha de Google Ads.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-purple-500 mt-0.5 shrink-0"></i>
+              <span><strong>Estudos (2 Horas):</strong> Curso Claude & IA aplicada.</span>
+            </li>
+            <li class="flex items-start gap-2 p-1.5 rounded-lg bg-pink-50/60 border border-pink-200 text-pink-900 font-semibold">
+              <i data-lucide="target" class="w-3.5 h-3.5 text-pink-600 mt-0.5 shrink-0"></i>
+              <span><strong>Prospecção Diária:</strong> Follow-up ativo e envio de orçamentos.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- QUINTA -->
+        <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-xs relative overflow-hidden">
+          <div class="w-1.5 h-full absolute left-0 top-0 bg-purple-400"></div>
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-gray-800">Quinta-feira</h3>
+            <span class="badge-lilas text-xs px-2.5 py-0.5 rounded-full font-medium">Academia 14h</span>
+          </div>
+          <ul class="space-y-2.5 text-xs text-gray-600">
+            <li class="flex items-start gap-2 p-2 rounded-xl bg-purple-50/70 border border-purple-200 text-purple-900 font-semibold">
+              <i data-lucide="sparkles" class="w-4 h-4 text-purple-600 mt-0.5 shrink-0"></i>
+              <span><strong>Terapia RD Dopamina & Leitura:</strong> Sessão / alinhamento do quadro de recuperação.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-pink-500 mt-0.5 shrink-0"></i>
+              <span><strong>Cooperkar (2/2):</strong> Envio de relatório semanal Ads + Portfólio.</span>
+            </li>
+            <li class="flex items-start gap-2 p-1.5 rounded-lg bg-blue-50/70 border border-blue-200 text-blue-900 font-medium">
+              <i data-lucide="briefcase" class="w-3.5 h-3.5 text-blue-600 mt-0.5 shrink-0"></i>
+              <span><strong>Demanda Livre (Gabi Lelis):</strong> Ajuste do site & criação do cardápio de Natal.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-purple-500 mt-0.5 shrink-0"></i>
+              <span><strong>Estudos (2 Horas):</strong> Descomplicando Sites (Prática).</span>
+            </li>
+            <li class="flex items-start gap-2 p-1.5 rounded-lg bg-pink-50/60 border border-pink-200 text-pink-900 font-semibold">
+              <i data-lucide="target" class="w-3.5 h-3.5 text-pink-600 mt-0.5 shrink-0"></i>
+              <span><strong>Prospecção Diária:</strong> Prospecção ativa no Instagram/Google/WhatsApp.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- SEXTA -->
+        <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-xs relative overflow-hidden">
+          <div class="w-1.5 h-full absolute left-0 top-0 bg-pink-400"></div>
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-gray-800">Sexta-feira</h3>
+            <span class="bg-gray-100 text-gray-700 text-xs px-2.5 py-0.5 rounded-full font-medium">Treino Flexível / Fechamento</span>
+          </div>
+          <ul class="space-y-2.5 text-xs text-gray-600">
+            <li class="flex items-start gap-2 p-1.5 rounded-lg bg-blue-50/70 border border-blue-200 text-blue-900 font-medium">
+              <i data-lucide="briefcase" class="w-3.5 h-3.5 text-blue-600 mt-0.5 shrink-0"></i>
+              <span><strong>Demandas Livres (Rayamara & Ana Cristina):</strong> Criar produto de recorrência e envio de contrato.</span>
+            </li>
+            <li class="flex items-start gap-2 p-1.5 rounded-lg bg-pink-50/60 border border-pink-200 text-pink-900 font-semibold">
+              <i data-lucide="target" class="w-3.5 h-3.5 text-pink-600 mt-0.5 shrink-0"></i>
+              <span><strong>Prospecção Diária:</strong> Fechamento de contratos e alinhamentos da semana.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-purple-500 mt-0.5 shrink-0"></i>
+              <span><strong>Estudos (2 Horas):</strong> Revisão geral dos 3 cursos.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-rose-500 mt-0.5 shrink-0"></i>
+              <span><strong>Leitura focada:</strong> Leitura calma para fechar a semana.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- SÁBADO -->
+        <div class="bg-white rounded-2xl border-2 border-pink-300 p-5 shadow-xs relative overflow-hidden">
+          <div class="w-2 h-full absolute left-0 top-0 bg-pink-500"></div>
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-gray-800">Sábado</h3>
+            <span class="badge-rose text-xs px-2.5 py-0.5 rounded-full font-bold">Autocuidado & Foco</span>
+          </div>
+          <ul class="space-y-2.5 text-xs text-gray-600">
+            <li class="flex items-start gap-2.5 p-3 rounded-xl bg-gradient-to-r from-pink-50 to-rose-50 border border-pink-200 text-pink-950 font-semibold shadow-2xs">
+              <i data-lucide="coffee" class="w-5 h-5 text-pink-600 mt-0.5 shrink-0"></i>
+              <div>
+                <span class="text-sm font-bold text-pink-900 block mb-0.5">Meu Café Especial (Ritual de Cuidado):</span>
+                <span class="text-xs text-gray-700 font-normal leading-relaxed">Uma forma carinhosa de cuidar de mim, preparar com calma um café especial só para mim, saborear sem pressa e me lembrar do meu próprio valor.</span>
+              </div>
+            </li>
+            <li class="flex items-start gap-2 p-2 rounded-xl bg-purple-50/70 border border-purple-200 text-purple-900 font-semibold">
+              <i data-lucide="book-marked" class="w-4 h-4 text-purple-600 mt-0.5 shrink-0"></i>
+              <span><strong>Estudos: Curso Patrícia Roberta</strong> (Imersão com calma nas aulas da mentoria).</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500 mt-0.5 shrink-0"></i>
+              <span><strong>Organização pessoal:</strong> Planejamento leve da semana seguinte.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- DOMINGO -->
+        <div class="bg-white rounded-2xl border-2 border-purple-200 p-5 shadow-xs relative overflow-hidden">
+          <div class="w-2 h-full absolute left-0 top-0 bg-purple-500"></div>
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-gray-800">Domingo</h3>
+            <span class="bg-purple-100 text-purple-800 text-xs px-2.5 py-0.5 rounded-full font-bold border border-purple-200">Igreja & Descanso</span>
+          </div>
+          <ul class="space-y-2.5 text-xs text-gray-600">
+            <li class="flex items-start gap-2 p-2.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 font-semibold">
+              <i data-lucide="church" class="w-4 h-4 text-purple-600 mt-0.5 shrink-0"></i>
+              <span><strong>DOMINGO (MUITO IMPORTANTE):</strong> Culto na IGREJA, renovação espiritual e conexão com Deus.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-purple-500 mt-0.5 shrink-0"></i>
+              <span><strong>Descanso Total:</strong> Recarregar as energias para começar a segunda em paz.</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ==================== ABA 3: CRM DE CLIENTES & DEMANDAS ==================== -->
+    <div id="view-crm" class="tab-content hidden space-y-6">
+      
+      <!-- Topo do CRM com Filtros e Novo Card -->
+      <div class="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <i data-lucide="kanban" class="w-5 h-5 text-purple-600"></i>
+            CRM de Demandas de Clientes
+          </h2>
+          <p class="text-xs text-gray-500">Organize clientes fixos semanais e clientes de demanda livre de tráfego.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Filtro -->
+          <div class="flex items-center bg-gray-100 p-1 rounded-xl text-xs font-medium">
+            <button onclick="filterCrm('todos')" id="filter-todos" class="crm-filter-btn px-3 py-1 rounded-lg bg-white shadow-xs text-gray-800">Todos</button>
+            <button onclick="filterCrm('fixo')" id="filter-fixo" class="crm-filter-btn px-3 py-1 rounded-lg text-gray-500 hover:text-gray-800">Fixos</button>
+            <button onclick="filterCrm('trafego')" id="filter-trafego" class="crm-filter-btn px-3 py-1 rounded-lg text-gray-500 hover:text-gray-800">Tráfego / Avulsos</button>
+          </div>
+
+          <!-- Botão Nova Demanda -->
+          <button onclick="openModalNewDemand()" class="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs font-semibold rounded-xl shadow-xs hover:opacity-95 transition flex items-center gap-1.5">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            Nova Demanda
+          </button>
+        </div>
+      </div>
+
+      <!-- KANBAN BOARD (Rolagem horizontal fluida no mobile) -->
+      <div class="flex lg:grid lg:grid-cols-4 gap-4 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory">
+        
+        <!-- Coluna 1: A Fazer -->
+        <div class="kanban-column bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col shrink-0 w-[85vw] sm:w-[320px] lg:w-auto snap-center shadow-xs">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">A Fazer</h3>
+            </div>
+            <span id="count-todo" class="text-xs bg-gray-100 text-gray-600 font-bold px-2 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="col-todo" class="space-y-3 flex-1 min-h-[300px]">
+            <!-- Cards -->
+          </div>
+        </div>
+
+        <!-- Coluna 2: Em Produção -->
+        <div class="kanban-column bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col shrink-0 w-[85vw] sm:w-[320px] lg:w-auto snap-center shadow-xs">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">Em Produção</h3>
+            </div>
+            <span id="count-doing" class="text-xs bg-purple-50 text-purple-700 font-bold px-2 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="col-doing" class="space-y-3 flex-1 min-h-[300px]">
+            <!-- Cards -->
+          </div>
+        </div>
+
+        <!-- Coluna 3: Aguardando Cliente -->
+        <div class="kanban-column bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col shrink-0 w-[85vw] sm:w-[320px] lg:w-auto snap-center shadow-xs">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">Aguardando Aprovação</h3>
+            </div>
+            <span id="count-waiting" class="text-xs bg-amber-50 text-amber-700 font-bold px-2 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="col-waiting" class="space-y-3 flex-1 min-h-[300px]">
+            <!-- Cards -->
+          </div>
+        </div>
+
+        <!-- Coluna 4: Concluído -->
+        <div class="kanban-column bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col shrink-0 w-[85vw] sm:w-[320px] lg:w-auto snap-center shadow-xs">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">Concluído</h3>
+            </div>
+            <span id="count-done" class="text-xs bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="col-done" class="space-y-3 flex-1 min-h-[300px]">
+            <!-- Cards -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ==================== ABA 4: ESTUDOS 2H & HÁBITOS ==================== -->
+    <div id="view-estudos" class="tab-content hidden space-y-6">
+      
+      <!-- Bloco de Estudos: Timer de 2 Horas -->
+      <div class="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-5">
+          <div>
+            <span class="badge-rose text-xs px-2.5 py-0.5 rounded-full font-semibold">Horário Fixo: 17:30 às 19:30</span>
+            <h2 class="text-xl font-bold text-gray-800 mt-1">Sessão Diária de Estudos (2 Horas)</h2>
+            <p class="text-xs text-gray-500">Distribua as 2 horas entre seus cursos prioritários com foco total.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="text-3xl font-extrabold text-gray-800 tracking-wider font-mono" id="studyTimerDisplay">02:00:00</div>
+            <button onclick="toggleStudyTimer()" id="studyTimerBtn" class="px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5">
+              <i data-lucide="play" class="w-4 h-4" id="studyTimerIcon"></i> Iniciar Timer
+            </button>
+            <button onclick="resetStudyTimer()" class="p-2 border border-gray-200 hover:bg-gray-50 text-gray-600 rounded-xl transition">
+              <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Os 3 Cursos com Lista Interativa de Aulas -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
+          
+          <!-- Curso 1: Patrícia Roberta -->
+          <div class="p-5 rounded-2xl border border-pink-100 bg-pink-50/30 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-gray-800 text-sm">Curso Patrícia Roberta</h3>
+                <i data-lucide="book-marked" class="w-4 h-4 text-pink-500"></i>
+              </div>
+              <p class="text-xs text-gray-500 mb-3">Aulas e metodologias da mentoria.</p>
+              
+              <!-- Input para adicionar aula assistida -->
+              <div class="flex items-center gap-1.5 mb-3">
+                <input type="text" id="input_aula_patricia" placeholder="Digitar nova aula concluída..." class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-pink-300">
+                <button onclick="addCourseLesson('patricia')" class="p-2 bg-pink-500 hover:bg-pink-600 text-white rounded-xl text-xs font-bold transition shadow-xs" title="Adicionar aula">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                </button>
+              </div>
+
+              <!-- Lista de Aulas Adicionadas -->
+              <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1" id="list_lessons_patricia">
+                <!-- Gerado dinamicamente -->
+              </div>
+            </div>
+            
+            <div class="pt-4 mt-4 border-t border-pink-200/60">
+              <button onclick="toggleCourseDone('patricia')" id="btn_patricia" class="w-full py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border bg-white text-gray-700 border-gray-300 hover:border-pink-400 shadow-2xs">
+                <span id="check_icon_patricia" class="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center text-[10px]"></span>
+                <span id="check_text_patricia">Marcar Estudo de Hoje Concluído</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Curso 2: Claude -->
+          <div class="p-5 rounded-2xl border border-purple-100 bg-purple-50/30 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-gray-800 text-sm">Curso Claude</h3>
+                <i data-lucide="cpu" class="w-4 h-4 text-purple-600"></i>
+              </div>
+              <p class="text-xs text-gray-500 mb-3">Engenharia de prompt, automações e IA.</p>
+              
+              <!-- Input para adicionar aula assistida -->
+              <div class="flex items-center gap-1.5 mb-3">
+                <input type="text" id="input_aula_claude" placeholder="Digitar nova aula concluída..." class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-purple-300">
+                <button onclick="addCourseLesson('claude')" class="p-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition shadow-xs" title="Adicionar aula">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                </button>
+              </div>
+
+              <!-- Lista de Aulas Adicionadas -->
+              <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1" id="list_lessons_claude">
+                <!-- Gerado dinamicamente -->
+              </div>
+            </div>
+
+            <div class="pt-4 mt-4 border-t border-purple-200/60">
+              <button onclick="toggleCourseDone('claude')" id="btn_claude" class="w-full py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border bg-white text-gray-700 border-gray-300 hover:border-purple-400 shadow-2xs">
+                <span id="check_icon_claude" class="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center text-[10px]"></span>
+                <span id="check_text_claude">Marcar Estudo de Hoje Concluído</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Curso 3: Descomplicando Sites -->
+          <div class="p-5 rounded-2xl border border-pink-100 bg-pink-50/30 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-gray-800 text-sm">Descomplicando Sites</h3>
+                <i data-lucide="layout" class="w-4 h-4 text-pink-500"></i>
+              </div>
+              <p class="text-xs text-gray-500 mb-3">Criação, WordPress, páginas e layout.</p>
+              
+              <!-- Input para adicionar aula assistida -->
+              <div class="flex items-center gap-1.5 mb-3">
+                <input type="text" id="input_aula_site" placeholder="Digitar nova aula concluída..." class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-pink-300">
+                <button onclick="addCourseLesson('site')" class="p-2 bg-pink-500 hover:bg-pink-600 text-white rounded-xl text-xs font-bold transition shadow-xs" title="Adicionar aula">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                </button>
+              </div>
+
+              <!-- Lista de Aulas Adicionadas -->
+              <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1" id="list_lessons_site">
+                <!-- Gerado dinamicamente -->
+              </div>
+            </div>
+
+            <div class="pt-4 mt-4 border-t border-pink-200/60">
+              <button onclick="toggleCourseDone('site')" id="btn_site" class="w-full py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border bg-white text-gray-700 border-gray-300 hover:border-pink-400 shadow-2xs">
+                <span id="check_icon_site" class="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center text-[10px]"></span>
+                <span id="check_text_site">Marcar Estudo de Hoje Concluído</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tracker de Hábitos & Dopamina -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Leitura 15 Minutos -->
+        <div class="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">
+              <i data-lucide="bookmark-check" class="w-5 h-5 text-rose-500"></i>
+              Rotina de Leitura Diária (15 min)
+            </h3>
+            <span class="badge-rose text-xs px-2.5 py-0.5 rounded-full font-medium">Anti-Dopamina</span>
+          </div>
+          <p class="text-xs text-gray-500 mb-4">Para quem está com dificuldade de ler: leia apenas 15 minutos cronometrados por dia, sem telefone por perto.</p>
+          
+          <div class="flex items-center gap-3">
+            <div class="text-2xl font-bold font-mono text-gray-800" id="readingTimerDisplay">15:00</div>
+            <button onclick="toggleReadingTimer()" id="readingTimerBtn" class="px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5">
+              <i data-lucide="play" class="w-4 h-4"></i> Começar Leitura
+            </button>
+          </div>
+        </div>
+
+        <!-- Terapia & Saúde Mental com Quadrinho Interativo 20:00 -->
+        <div class="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">
+                <i data-lucide="heart" class="w-5 h-5 text-purple-600"></i>
+                Terapia RD Dopamina & Leitura
+              </h3>
+              <span class="badge-lilas text-xs px-2.5 py-0.5 rounded-full font-bold">20:00 Pontual</span>
+            </div>
+            <p class="text-xs text-gray-500 mb-4">Sessão e acompanhamento do quadro de recuperação de foco e regulação de dopamina.</p>
+            <div class="p-3 bg-purple-50/70 border border-purple-200 rounded-xl text-xs text-purple-900 font-medium flex items-center gap-2 mb-4">
+              <i data-lucide="clock" class="w-4 h-4 text-purple-600 shrink-0"></i>
+              <span>Horários protegidos às 20:00: Terça-feira (20h) e Quinta-feira (20h).</span>
+            </div>
+          </div>
+
+          <!-- Quadrinho de Checks Terça 20:00 e Quinta 20:00 -->
+          <div class="pt-3 border-t border-purple-100">
+            <label class="block text-xs font-bold text-gray-700 mb-2">Check-in da Sessão:</label>
+            <div class="grid grid-cols-2 gap-2" id="therapyHabitTracker">
+              <!-- Botoes Terça 20:00 e Quinta 20:00 -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- MODAL PARA ADICIONAR NOVA DEMANDA NO CRM -->
+  <div id="modalNewDemand" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-md p-6 border border-gray-200 shadow-xl space-y-4">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <h3 class="text-base font-bold text-gray-800">Nova Demanda de Cliente</h3>
+        <button onclick="closeModalNewDemand()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <form id="formNewDemand" onsubmit="saveNewDemand(event)" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Nome do Cliente:</label>
+          <input type="text" id="inputClientName" required placeholder="Ex: Novo Cliente Tráfego" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-300 text-xs">
+        </div>
+
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Descrição da Demanda:</label>
+          <input type="text" id="inputDemandTitle" required placeholder="Ex: Subir campanha nova de leads" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-300 text-xs">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">Tipo de Cliente:</label>
+            <select id="inputType" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-300 text-xs bg-white">
+              <option value="fixo">Cliente Fixo</option>
+              <option value="trafego" selected>Demanda de Tráfego / Avulso</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">Prioridade:</label>
+            <select id="inputPriority" class="w-full px-3 py-2 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-300 text-xs bg-white">
+              <option value="alta">Alta</option>
+              <option value="media" selected>Média</option>
+              <option value="baixa">Baixa</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-3 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeModalNewDemand()" class="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xl">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-pink-500 to-purple-600 rounded-xl shadow-xs hover:opacity-95">Salvar Demanda</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPT PRINCIPAL COM PERSISTÊNCIA EM LOCALSTORAGE -->
+  <script>
+    // 1. DADOS INICIAIS BASEADOS NO PROMPT COMPLETO DA USUÁRIA
+    const defaultSchedule = [
+      { id: 'b1', time: '08:00 - 09:30', title: 'Ritual Matinal & Despertar', desc: 'Acordar às 08:00, oração/devocional e café sem pressa.', category: 'matinal', done: false },
+      { id: 'b2', time: '09:30 - 12:30 (3h)', title: 'Bloco Trabalho Manhã: Clientes Fixos', desc: 'Foco nos clientes prioritários do dia (Lilian, Cooperkar, Carine, Óticas, Terencio).', category: 'trabalho', done: false },
+      { id: 'b3', time: '12:30 - 13:30', title: 'Almoço & Descanso', desc: 'Pausa sem telas, reset mental e nutrição.', category: 'pausa', done: false },
+      { id: 'b4', time: '14:00 - 15:30', title: 'ACADEMIA (Horário Fixo)', desc: 'Mínimo 3 dias na semana (Terça a Sexta). Segunda sem treino!', category: 'academia', done: false },
+      { id: 'b5', time: '15:30 - 17:30 (2h)', title: 'Bloco Trabalho Tarde: Tráfego & Prospecção Ativa', desc: 'Prospecção diária de clientes (Seg a Sex) + ajustes de campanhas, sites e contratos.', category: 'trabalho', done: false },
+      { id: 'b6', time: '17:30 - 19:30 (2h)', title: 'ESTUDOS 2 HORAS (Obrigatório)', desc: 'Dividido entre: Curso Patrícia Roberta, Claude e Descomplicando Sites.', category: 'estudo', done: false },
+      { id: 'b7', time: '19:30 em diante', title: 'Leitura 15 min & Compromissos Noturnos', desc: 'Segunda: GAD Igreja 19:00 | Quinta: Terapia RD Dopamina | Domingo: Igreja.', category: 'noite', done: false }
+    ];
+
+    const defaultDemands = [
+      { id: 'd1', client: 'Lilian', title: 'Enviar linha editorial (Envio 1/2)', type: 'fixo', priority: 'alta', status: 'todo' },
+      { id: 'd2', client: 'Lilian', title: 'Enviar linha editorial (Envio 2/2)', type: 'fixo', priority: 'alta', status: 'todo' },
+      { id: 'd3', client: 'Cooperkar', title: 'Atualização do Ads & Google Meu Negócio', type: 'fixo', priority: 'alta', status: 'todo' },
+      { id: 'd4', client: 'Cooperkar', title: 'Relatório semanal do Ads', type: 'fixo', priority: 'alta', status: 'todo' },
+      { id: 'd_cooperkar_portf', client: 'Cooperkar', title: 'Fazer portfólio', type: 'fixo', priority: 'alta', status: 'todo' },
+      { id: 'd5', client: 'Ótica Vidal', title: 'Relatório semanal', type: 'fixo', priority: 'media', status: 'todo' },
+      { id: 'd6', client: 'Ótica Vision', title: 'Relatório semanal', type: 'fixo', priority: 'media', status: 'todo' },
+      { id: 'd7', client: 'Terencio Imóveis', title: 'Acompanhamento e relatório semanal', type: 'fixo', priority: 'media', status: 'todo' },
+      { id: 'd_carine_f1', client: 'Carine (Semana 1 - Fase 1)', title: 'Instagram Profissional + WhatsApp Business estruturado', type: 'fixo', priority: 'alta', status: 'todo' },
+      { id: 'd_carine_f2', client: 'Carine (Semana 2 - Fase 2)', title: 'Catálogo Profissional + Site e Espaço Físico', type: 'fixo', priority: 'alta', status: 'todo' },
+      { id: 'd_carine_f3', client: 'Carine (Semana 3 - Fase 3)', title: 'Estratégia e ativação de Tráfego Pago', type: 'fixo', priority: 'alta', status: 'todo' },
+      
+      // Demandas Livres de Tráfego citadas
+      { id: 'd8', client: 'Eliene', title: 'Ajuste do site', type: 'trafego', priority: 'alta', status: 'todo' },
+      { id: 'd9', client: 'Marcos Peres', title: 'Ajuste de relatório Google Ads', type: 'trafego', priority: 'media', status: 'todo' },
+      { id: 'd10', client: 'Cayan', title: 'Enviar / criar campanha Google Ads', type: 'trafego', priority: 'alta', status: 'todo' },
+      { id: 'd11', client: 'Gabi Lelis', title: 'Ajuste do site', type: 'trafego', priority: 'media', status: 'todo' },
+      { id: 'd12', client: 'Gabi Lelis', title: 'Criação do cardápio de Natal', type: 'trafego', priority: 'media', status: 'todo' },
+      { id: 'd13', client: 'Rayamara', title: 'Criar produto de recorrência e enviar', type: 'trafego', priority: 'alta', status: 'todo' },
+      { id: 'd14', client: 'Ana Cristina', title: 'Ajuste e envio de contrato', type: 'trafego', priority: 'media', status: 'todo' }
+    ];
+
+    // Estados
+    let schedule = JSON.parse(localStorage.getItem('minha_rotina_schedule')) || defaultSchedule;
+    let demands = JSON.parse(localStorage.getItem('minha_rotina_demands')) || defaultDemands;
+    let gymDays = JSON.parse(localStorage.getItem('minha_rotina_gym')) || { ter: false, qua: false, qui: false, sex: false, sab: false };
+    let readingDone = JSON.parse(localStorage.getItem('minha_rotina_reading')) || false;
+    let currentCrmFilter = 'todos';
+
+    // Timer de Estudo
+    let studyTimerSeconds = 2 * 60 * 60; // 2 horas = 7200s
+    let studyTimerInterval = null;
+
+    // Timer de Leitura
+    let readingTimerSeconds = 15 * 60; // 15 min
+    let readingTimerInterval = null;
+
+    // 2. INICIALIZAÇÃO
+    window.addEventListener('DOMContentLoaded', () => {
+      // Garante que todas as 15 demandas oficiais estejam sincronizadas no CRM Kanban
+      const officialDemands = [
+        // Fases da Carine
+        { id: 'd_carine_f1', client: 'Carine (Semana 1 - Fase 1)', title: 'Instagram Profissional + WhatsApp Business', type: 'fixo', priority: 'alta', status: 'todo' },
+        { id: 'd_carine_f2', client: 'Carine (Semana 2 - Fase 2)', title: 'Catálogo Profissional + Site & Espaço Físico', type: 'fixo', priority: 'alta', status: 'todo' },
+        { id: 'd_carine_f3', client: 'Carine (Semana 3 - Fase 3)', title: 'Estratégia e ativação de Tráfego Pago', type: 'fixo', priority: 'alta', status: 'todo' },
+        // Prospecção Ativa
+        { id: 'd_prospeccao', client: 'Prospecção Ativa (Diária)', title: 'Novos contatos, follow-ups de leads e propostas (Seg a Sex)', type: 'fixo', priority: 'alta', status: 'doing' },
+        // Cooperkar
+        { id: 'd_cooperkar_portf', client: 'Cooperkar', title: 'Fazer portfólio', type: 'fixo', priority: 'alta', status: 'todo' },
+        { id: 'd3', client: 'Cooperkar', title: 'Atualização do Ads & Google Meu Negócio', type: 'fixo', priority: 'alta', status: 'todo' },
+        { id: 'd4', client: 'Cooperkar', title: 'Relatório semanal do Ads', type: 'fixo', priority: 'alta', status: 'todo' },
+        // Lilian
+        { id: 'd1', client: 'Lilian', title: 'Enviar linha editorial (Envio 1/2)', type: 'fixo', priority: 'alta', status: 'todo' },
+        { id: 'd2', client: 'Lilian', title: 'Enviar linha editorial (Envio 2/2)', type: 'fixo', priority: 'alta', status: 'todo' },
+        // Óticas & Terencio
+        { id: 'd5', client: 'Ótica Vidal', title: 'Relatório semanal', type: 'fixo', priority: 'media', status: 'todo' },
+        { id: 'd6', client: 'Ótica Vision', title: 'Relatório semanal', type: 'fixo', priority: 'media', status: 'todo' },
+        { id: 'd7', client: 'Terencio Imóveis', title: 'Acompanhamento e relatório semanal', type: 'fixo', priority: 'media', status: 'todo' },
+        // Demandas Livres de Tráfego
+        { id: 'd8', client: 'Eliene', title: 'Ajuste do site', type: 'trafego', priority: 'alta', status: 'todo' },
+        { id: 'd9', client: 'Marcos Peres', title: 'Ajuste de relatório Google Ads', type: 'trafego', priority: 'media', status: 'todo' },
+        { id: 'd10', client: 'Cayan', title: 'Enviar / criar campanha Google Ads', type: 'trafego', priority: 'alta', status: 'todo' },
+        { id: 'd11', client: 'Gabi Lelis', title: 'Ajuste do site', type: 'trafego', priority: 'media', status: 'todo' },
+        { id: 'd12', client: 'Gabi Lelis', title: 'Criação do cardápio de Natal', type: 'trafego', priority: 'media', status: 'todo' },
+        { id: 'd13', client: 'Rayamara', title: 'Criar produto de recorrência e enviar', type: 'trafego', priority: 'alta', status: 'todo' },
+        { id: 'd14', client: 'Ana Cristina', title: 'Ajuste e envio de contrato', type: 'trafego', priority: 'media', status: 'todo' }
+      ];
+
+      // Mescla com estados existentes sem perder nada
+      const savedDemands = JSON.parse(localStorage.getItem('minha_rotina_demands')) || [];
+      const statusMap = {};
+      savedDemands.forEach(d => { statusMap[d.id] = d.status; });
+
+      demands = officialDemands.map(d => ({
+        ...d,
+        status: statusMap[d.id] || d.status
+      }));
+
+      localStorage.setItem('minha_rotina_demands', JSON.stringify(demands));
+
+      lucide.createIcons();
+      updateClock();
+      setInterval(updateClock, 1000);
+      renderSchedule();
+      renderTodayFixedClients();
+      renderGymTracker();
+      renderTherapyTracker();
+      renderChurchTracker();
+      renderProspectTracker();
+      renderReadingStatus();
+      renderKanban();
+      loadStudyNotes();
+    });
+
+    // Relógio e Data
+    function updateClock() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('pt-BR');
+      document.getElementById('liveClock').textContent = timeStr;
+
+      const options = { weekday: 'long', day: 'numeric', month: 'long' };
+      document.getElementById('liveDate').textContent = now.toLocaleDateString('pt-BR', options);
+    }
+
+    // Navegação de Abas
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('border-pink-500', 'text-pink-600');
+        btn.classList.add('border-transparent', 'text-gray-500');
+      });
+
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      activeBtn.classList.remove('border-transparent', 'text-gray-500');
+      activeBtn.classList.add('border-pink-500', 'text-pink-600');
+      lucide.createIcons();
+    }
+
+    // Renderização dos Blocos Horários de Hoje
+    function renderSchedule() {
+      const container = document.getElementById('scheduleContainer');
+      container.innerHTML = '';
+      let doneCount = 0;
+
+      schedule.forEach((item, index) => {
+        if (item.done) doneCount++;
+
+        const isGym = item.category === 'academia';
+        const isStudy = item.category === 'estudo';
+
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-2xl border transition ${
+          item.done 
+            ? 'bg-gray-50/70 border-gray-200 opacity-60' 
+            : isGym 
+              ? 'bg-purple-50/40 border-purple-200' 
+              : isStudy 
+                ? 'bg-pink-50/40 border-pink-200' 
+                : 'bg-white border-gray-200 hover:border-gray-300 shadow-2xs'
+        }`;
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleScheduleBlock(${index})" class="mt-1 w-4 h-4 rounded text-pink-500 focus:ring-pink-400 border-gray-300 cursor-pointer">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold ${isGym ? 'text-purple-700' : isStudy ? 'text-pink-700' : 'text-gray-700'}">${item.time}</span>
+                  ${isGym ? '<span class="badge-lilas text-[10px] px-2 py-0.2 rounded-full font-bold">14:00 FIXO</span>' : ''}
+                  ${isStudy ? '<span class="badge-rose text-[10px] px-2 py-0.2 rounded-full font-bold">2 HORAS</span>' : ''}
+                </div>
+                <h4 class="text-sm font-bold text-gray-800 ${item.done ? 'line-through text-gray-400' : ''}">${item.title}</h4>
+                <p class="text-xs text-gray-500 mt-0.5">${item.desc}</p>
+              </div>
+            </div>
+            <span class="text-xs font-medium px-2 py-0.5 rounded-md ${item.done ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-gray-100 text-gray-600'}">
+              ${item.done ? 'Feito' : 'Pendente'}
+            </span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      const total = schedule.length;
+      const pct = Math.round((doneCount / total) * 100);
+      document.getElementById('dayProgressPercent').textContent = `${pct}% concluído hoje`;
+    }
+
+    function toggleScheduleBlock(index) {
+      schedule[index].done = !schedule[index].done;
+      localStorage.setItem('minha_rotina_schedule', JSON.stringify(schedule));
+      renderSchedule();
+    }
+
+    function resetDayTasks() {
+      schedule.forEach(s => s.done = false);
+      localStorage.setItem('minha_rotina_schedule', JSON.stringify(schedule));
+      renderSchedule();
+    }
+
+    // Clientes Fixos por dia da semana
+    function renderTodayFixedClients() {
+      const container = document.getElementById('todayFixedClients');
+      const day = new Date().getDay(); // 0 = Domingo, 1 = Seg, 2 = Ter, 3 = Qua, 4 = Qui, 5 = Sex, 6 = Sáb
+      
+      let clientList = [];
+      if (day === 1) { // Segunda
+        clientList = [
+          { name: 'IGREJA (GAD 19:00)', task: 'Compromisso Inegociável / Muito Importante' },
+          { name: 'Lilian', task: 'Linha Editorial (Envio 1/2)' },
+          { name: 'Carine (Fase 1)', task: 'Instagram Profissional + WhatsApp' }
+        ];
+      } else if (day === 2) { // Terça
+        clientList = [
+          { name: 'Terapia RD Dopamina', task: 'Sessão / Protocolo de Leitura e Foco' },
+          { name: 'Cooperkar', task: 'Ads & Google Meu Negócio' },
+          { name: 'Ótica Vidal & Vision', task: 'Relatórios Semanais' }
+        ];
+      } else if (day === 3) { // Quarta
+        clientList = [
+          { name: 'Lilian', task: 'Linha Editorial (Envio 2/2)' },
+          { name: 'Terencio Imóveis', task: 'Acompanhamento Semanal' },
+          { name: 'Carine (Fase 1)', task: 'Alinhamento da entrega semanal' }
+        ];
+      } else if (day === 4) { // Quinta
+        clientList = [
+          { name: 'Terapia RD Dopamina', task: 'Sessão / Protocolo de Leitura e Foco' },
+          { name: 'Cooperkar', task: 'Relatório Ads Semanal' }
+        ];
+      } else if (day === 5) { // Sexta
+        clientList = [
+          { name: 'Demandas Livres', task: 'Finalização de campanhas e contratos' }
+        ];
+      } else if (day === 6) { // Sábado
+        clientList = [
+          { name: '☕ Meu Café Especial', task: 'Meu momento de carinho e lembrar de mim mesma' },
+          { name: 'Estudos: Patrícia Roberta', task: 'Imersão nas aulas com calma e foco' },
+          { name: 'Organização Pessoal', task: 'Planejamento leve da semana' }
+        ];
+      } else { // Domingo (0)
+        clientList = [
+          { name: 'DOMINGO: IGREJA', task: 'Culto, renovação espiritual e descanso sagrado' }
+        ];
+      }
+
+      container.innerHTML = clientList.map(c => `
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-pink-50/40 border border-pink-100">
+          <div>
+            <span class="font-bold text-gray-800 text-xs">${c.name}</span>
+            <p class="text-[11px] text-gray-500">${c.task}</p>
+          </div>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-pink-400"></i>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    // Tracker de Academia
+    function renderGymTracker() {
+      const container = document.getElementById('gymDaysTracker');
+      const days = [
+        { id: 'ter', label: 'Ter' },
+        { id: 'qua', label: 'Qua' },
+        { id: 'qui', label: 'Qui' },
+        { id: 'sex', label: 'Sex' },
+        { id: 'sab', label: 'Sáb' },
+      ];
+
+      container.innerHTML = days.map(d => {
+        const checked = gymDays[d.id];
+        return `
+          <button onclick="toggleGymDay('${d.id}')" class="p-2 rounded-xl text-center border transition ${
+            checked 
+              ? 'bg-purple-600 text-white border-purple-600 font-bold shadow-xs' 
+              : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 font-medium'
+          }">
+            <div class="text-xs uppercase">${d.label}</div>
+            <div class="text-[10px] mt-0.5">${checked ? '✓' : '14h'}</div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function toggleGymDay(id) {
+      gymDays[id] = !gymDays[id];
+      localStorage.setItem('minha_rotina_gym', JSON.stringify(gymDays));
+      renderGymTracker();
+    }
+
+    // Tracker de Terapia RD Dopamina (Igual ao da Academia)
+    let therapyDays = JSON.parse(localStorage.getItem('minha_rotina_therapy')) || { ter: false, qui: false };
+
+    function renderTherapyTracker() {
+      const container1 = document.getElementById('therapyDaysTracker');
+      const container2 = document.getElementById('therapyHabitTracker');
+
+      const days = [
+        { id: 'ter', label: 'Terça 20:00' },
+        { id: 'qui', label: 'Quinta 20:00' }
+      ];
+
+      const html = days.map(d => {
+        const checked = therapyDays[d.id];
+        return `
+          <button onclick="toggleTherapyDay('${d.id}')" class="p-2.5 rounded-xl text-center border transition ${
+            checked 
+              ? 'bg-pink-600 text-white border-pink-600 font-bold shadow-xs' 
+              : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-pink-50 font-medium'
+          }">
+            <div class="text-xs font-bold uppercase">${d.label}</div>
+            <div class="text-[11px] mt-0.5">${checked ? '✓ Concluído' : 'Sessão 20h'}</div>
+          </button>
+        `;
+      }).join('');
+
+      if (container1) container1.innerHTML = html;
+      if (container2) container2.innerHTML = html;
+    }
+
+    function toggleTherapyDay(id) {
+      therapyDays[id] = !therapyDays[id];
+      localStorage.setItem('minha_rotina_therapy', JSON.stringify(therapyDays));
+      renderTherapyTracker();
+    }
+
+    // Tracker de Igreja & Vida Espiritual (Segunda GAD e Domingo Culto)
+    let churchDays = JSON.parse(localStorage.getItem('minha_rotina_church')) || { seg: false, dom: false };
+
+    function renderChurchTracker() {
+      const container = document.getElementById('churchDaysTracker');
+      if (!container) return;
+      const days = [
+        { id: 'seg', label: 'Segunda 19h', sub: 'GAD Igreja' },
+        { id: 'dom', label: 'Domingo', sub: 'Culto Igreja' }
+      ];
+
+      container.innerHTML = days.map(d => {
+        const checked = churchDays[d.id];
+        return `
+          <button onclick="toggleChurchDay('${d.id}')" class="p-2.5 rounded-xl text-center border transition ${
+            checked 
+              ? 'bg-purple-600 text-white border-purple-600 font-bold shadow-xs' 
+              : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-purple-50 font-medium'
+          }">
+            <div class="text-xs uppercase font-bold">${d.label}</div>
+            <div class="text-[11px] mt-0.5">${checked ? '✓ Presente' : d.sub}</div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function toggleChurchDay(id) {
+      churchDays[id] = !churchDays[id];
+      localStorage.setItem('minha_rotina_church', JSON.stringify(churchDays));
+      renderChurchTracker();
+    }
+
+    // Tracker de Prospecção Diária (Segunda a Sexta) - IGUAL AO DA ACADEMIA
+    let prospectDays = JSON.parse(localStorage.getItem('minha_rotina_prospect')) || { seg: false, ter: false, qua: false, qui: false, sex: false };
+
+    function renderProspectTracker() {
+      const container = document.getElementById('prospectDaysTracker');
+      if (!container) return;
+      const days = [
+        { id: 'seg', label: 'Seg' },
+        { id: 'ter', label: 'Ter' },
+        { id: 'qua', label: 'Qua' },
+        { id: 'qui', label: 'Qui' },
+        { id: 'sex', label: 'Sex' }
+      ];
+
+      container.innerHTML = days.map(d => {
+        const checked = prospectDays[d.id];
+        return `
+          <button onclick="toggleProspectDay('${d.id}')" class="p-2 rounded-xl text-center border transition ${
+            checked 
+              ? 'bg-pink-600 text-white border-pink-600 font-bold shadow-xs' 
+              : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 font-medium'
+          }">
+            <div class="text-xs uppercase">${d.label}</div>
+            <div class="text-[10px] mt-0.5">${checked ? '✓ Feito' : 'Prosp.'}</div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function toggleProspectDay(id) {
+      prospectDays[id] = !prospectDays[id];
+      localStorage.setItem('minha_rotina_prospect', JSON.stringify(prospectDays));
+      renderProspectTracker();
+    }
+
+    // Leitura Anti-Dopamina
+    function renderReadingStatus() {
+      const text = document.getElementById('readingStatusText');
+      const btn = document.getElementById('readingBtn');
+      if (readingDone) {
+        text.textContent = '✓ Leitura de 15 min concluída hoje!';
+        text.className = 'text-xs font-bold text-emerald-600';
+        btn.textContent = 'Concluído';
+        btn.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500 text-white';
+      } else {
+        text.textContent = 'Pendente hoje (15 min)';
+        text.className = 'text-xs font-semibold text-gray-700';
+        btn.textContent = 'Marcar como Lido';
+        btn.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-pink-500 hover:bg-pink-600 text-white transition shadow-xs';
+      }
+    }
+
+    function toggleReading() {
+      readingDone = !readingDone;
+      localStorage.setItem('minha_rotina_reading', JSON.stringify(readingDone));
+      renderReadingStatus();
+    }
+
+    // KANBAN CRM
+    function renderKanban() {
+      const cols = {
+        todo: document.getElementById('col-todo'),
+        doing: document.getElementById('col-doing'),
+        waiting: document.getElementById('col-waiting'),
+        done: document.getElementById('col-done')
+      };
+
+      Object.values(cols).forEach(c => c.innerHTML = '');
+
+      const filtered = demands.filter(d => {
+        if (currentCrmFilter === 'fixo') return d.type === 'fixo';
+        if (currentCrmFilter === 'trafego') return d.type === 'trafego';
+        return true;
+      });
+
+      const counts = { todo: 0, doing: 0, waiting: 0, done: 0 };
+
+      filtered.forEach(item => {
+        counts[item.status]++;
+        const card = document.createElement('div');
+        card.className = 'bg-white p-3.5 rounded-xl border border-gray-200 hover:border-pink-300 shadow-2xs space-y-2.5 transition';
+        
+        const isFixo = item.type === 'fixo';
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${isFixo ? 'badge-rose' : 'badge-lilas'}">
+              ${isFixo ? 'Cliente Fixo' : 'Demanda Tráfego'}
+            </span>
+            <div class="flex items-center gap-1">
+              <button onclick="moveDemand('${item.id}', -1)" title="Voltar status" class="text-gray-400 hover:text-gray-700 text-xs px-1">◀</button>
+              <button onclick="moveDemand('${item.id}', 1)" title="Avançar status" class="text-gray-400 hover:text-gray-700 text-xs px-1">▶</button>
+              <button onclick="deleteDemand('${item.id}')" title="Excluir" class="text-gray-300 hover:text-red-500 text-xs px-1">✕</button>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="text-xs font-bold text-gray-800">${item.client}</h4>
+            <p class="text-xs text-gray-600 mt-0.5 leading-snug">${item.title}</p>
+          </div>
+
+          <div class="pt-1.5 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500">
+            <span class="capitalize flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full ${item.priority === 'alta' ? 'bg-red-500' : 'bg-amber-400'}"></span>
+              Prioridade ${item.priority}
+            </span>
+          </div>
+        `;
+
+        if (cols[item.status]) {
+          cols[item.status].appendChild(card);
+        }
+      });
+
+      document.getElementById('count-todo').textContent = counts.todo;
+      document.getElementById('count-doing').textContent = counts.doing;
+      document.getElementById('count-waiting').textContent = counts.waiting;
+      document.getElementById('count-done').textContent = counts.done;
+      lucide.createIcons();
+    }
+
+    function filterCrm(type) {
+      currentCrmFilter = type;
+      document.querySelectorAll('.crm-filter-btn').forEach(b => {
+        b.className = 'crm-filter-btn px-3 py-1 rounded-lg text-gray-500 hover:text-gray-800';
+      });
+      const active = document.getElementById(`filter-${type}`);
+      active.className = 'crm-filter-btn px-3 py-1 rounded-lg bg-white shadow-xs text-gray-800 font-bold';
+      renderKanban();
+    }
+
+    function moveDemand(id, dir) {
+      const statuses = ['todo', 'doing', 'waiting', 'done'];
+      const index = demands.findIndex(d => d.id === id);
+      if (index === -1) return;
+
+      let currentIdx = statuses.indexOf(demands[index].status);
+      let nextIdx = currentIdx + dir;
+      if (nextIdx >= 0 && nextIdx < statuses.length) {
+        demands[index].status = statuses[nextIdx];
+        localStorage.setItem('minha_rotina_demands', JSON.stringify(demands));
+        renderKanban();
+      }
+    }
+
+    function deleteDemand(id) {
+      demands = demands.filter(d => d.id !== id);
+      localStorage.setItem('minha_rotina_demands', JSON.stringify(demands));
+      renderKanban();
+    }
+
+    // Modal Nova Demanda
+    function openModalNewDemand() {
+      document.getElementById('modalNewDemand').classList.remove('hidden');
+    }
+
+    function closeModalNewDemand() {
+      document.getElementById('modalNewDemand').classList.add('hidden');
+      document.getElementById('formNewDemand').reset();
+    }
+
+    function saveNewDemand(e) {
+      e.preventDefault();
+      const newD = {
+        id: 'd_' + Date.now(),
+        client: document.getElementById('inputClientName').value.trim(),
+        title: document.getElementById('inputDemandTitle').value.trim(),
+        type: document.getElementById('inputType').value,
+        priority: document.getElementById('inputPriority').value,
+        status: 'todo'
+      };
+
+      demands.push(newD);
+      localStorage.setItem('minha_rotina_demands', JSON.stringify(demands));
+      closeModalNewDemand();
+      renderKanban();
+    }
+
+    // Anotações e Checks dos 3 Cursos
+    let courseStatus = JSON.parse(localStorage.getItem('minha_rotina_courses_done')) || { patricia: false, claude: false, site: false };
+
+    function toggleCourseDone(course) {
+      courseStatus[course] = !courseStatus[course];
+      localStorage.setItem('minha_rotina_courses_done', JSON.stringify(courseStatus));
+      renderCourseChecks();
+    }
+
+    function renderCourseChecks() {
+      ['patricia', 'claude', 'site'].forEach(c => {
+        const isDone = courseStatus[c];
+        const btn = document.getElementById(`btn_${c}`);
+        const icon = document.getElementById(`check_icon_${c}`);
+        const text = document.getElementById(`check_text_${c}`);
+
+        if (!btn || !icon || !text) return;
+
+        if (isDone) {
+          btn.className = 'w-full py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-emerald-500 text-white border border-emerald-600 shadow-xs';
+          icon.className = 'w-4 h-4 rounded-full bg-white text-emerald-600 font-extrabold flex items-center justify-center text-[10px]';
+          icon.textContent = '✓';
+          text.textContent = 'Estudo de Hoje Concluído!';
+        } else {
+          btn.className = 'w-full py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border bg-white text-gray-700 border-gray-300 hover:border-pink-400 shadow-2xs';
+          icon.className = 'w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center text-[10px]';
+          icon.textContent = '';
+          text.textContent = 'Marcar Estudo Concluído';
+        }
+      });
+    }
+
+    // Gerenciador Interativo de Aulas por Curso
+    let courseLessons = JSON.parse(localStorage.getItem('minha_rotina_course_lessons')) || {
+      patricia: ['Módulo 1 - Boas-vindas', 'Módulo 2 - Posicionamento'],
+      claude: ['Módulo 1 - Fundamentos do Claude'],
+      site: ['Módulo 1 - Domínio e Hospedagem']
+    };
+
+    function addCourseLesson(course) {
+      const input = document.getElementById(`input_aula_${course}`);
+      if (!input || !input.value.trim()) return;
+      const lessonTitle = input.value.trim();
+      courseLessons[course].push(lessonTitle);
+      localStorage.setItem('minha_rotina_course_lessons', JSON.stringify(courseLessons));
+      input.value = '';
+      renderCourseLessons();
+    }
+
+    function removeCourseLesson(course, index) {
+      courseLessons[course].splice(index, 1);
+      localStorage.setItem('minha_rotina_course_lessons', JSON.stringify(courseLessons));
+      renderCourseLessons();
+    }
+
+    function renderCourseLessons() {
+      ['patricia', 'claude', 'site'].forEach(c => {
+        const container = document.getElementById(`list_lessons_${c}`);
+        if (!container) return;
+        const list = courseLessons[c] || [];
+        if (list.length === 0) {
+          container.innerHTML = `<p class="text-[11px] text-gray-400 italic py-1">Nenhuma aula registrada ainda.</p>`;
+          return;
+        }
+
+        container.innerHTML = list.map((item, idx) => `
+          <div class="flex items-center justify-between p-2 rounded-xl bg-white border border-gray-200/80 shadow-2xs group">
+            <span class="text-xs text-gray-700 font-medium truncate flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-pink-500"></span>
+              ${item}
+            </span>
+            <button onclick="removeCourseLesson('${c}', ${idx})" title="Excluir aula" class="text-gray-300 hover:text-red-500 text-xs px-1 transition">
+              ✕
+            </button>
+          </div>
+        `).join('');
+      });
+      lucide.createIcons();
+    }
+
+    function loadStudyNotes() {
+      renderCourseChecks();
+      renderCourseLessons();
+    }
+
+    // Timer de Estudos (2h)
+    function toggleStudyTimer() {
+      const btn = document.getElementById('studyTimerBtn');
+      if (studyTimerInterval) {
+        clearInterval(studyTimerInterval);
+        studyTimerInterval = null;
+        btn.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i> Continuar`;
+        btn.classList.remove('bg-amber-500');
+        btn.classList.add('bg-pink-500');
+      } else {
+        studyTimerInterval = setInterval(() => {
+          if (studyTimerSeconds > 0) {
+            studyTimerSeconds--;
+            updateStudyTimerDisplay();
+          } else {
+            clearInterval(studyTimerInterval);
+            alert('Parabéns! Você completou suas 2 horas de estudo de hoje!');
+          }
+        }, 1000);
+        btn.innerHTML = `<i data-lucide="pause" class="w-4 h-4"></i> Pausar`;
+        btn.classList.remove('bg-pink-500');
+        btn.classList.add('bg-amber-500');
+      }
+      lucide.createIcons();
+    }
+
+    function resetStudyTimer() {
+      clearInterval(studyTimerInterval);
+      studyTimerInterval = null;
+      studyTimerSeconds = 2 * 60 * 60;
+      updateStudyTimerDisplay();
+      const btn = document.getElementById('studyTimerBtn');
+      btn.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i> Iniciar Timer`;
+      btn.classList.remove('bg-amber-500');
+      btn.classList.add('bg-pink-500');
+      lucide.createIcons();
+    }
+
+    function updateStudyTimerDisplay() {
+      const h = String(Math.floor(studyTimerSeconds / 3600)).padStart(2, '0');
+      const m = String(Math.floor((studyTimerSeconds % 3600) / 60)).padStart(2, '0');
+      const s = String(studyTimerSeconds % 60).padStart(2, '0');
+      document.getElementById('studyTimerDisplay').textContent = `${h}:${m}:${s}`;
+    }
+
+    // Timer de Leitura (15min)
+    function toggleReadingTimer() {
+      const btn = document.getElementById('readingTimerBtn');
+      if (readingTimerInterval) {
+        clearInterval(readingTimerInterval);
+        readingTimerInterval = null;
+        btn.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i> Continuar`;
+      } else {
+        readingTimerInterval = setInterval(() => {
+          if (readingTimerSeconds > 0) {
+            readingTimerSeconds--;
+            const m = String(Math.floor(readingTimerSeconds / 60)).padStart(2, '0');
+            const s = String(readingTimerSeconds % 60).padStart(2, '0');
+            document.getElementById('readingTimerDisplay').textContent = `${m}:${s}`;
+          } else {
+            clearInterval(readingTimerInterval);
+            alert('Excelente! Seus 15 minutos de leitura foram concluídos!');
+            readingDone = true;
+            localStorage.setItem('minha_rotina_reading', JSON.stringify(true));
+            renderReadingStatus();
+          }
+        }, 1000);
+        btn.innerHTML = `<i data-lucide="pause" class="w-4 h-4"></i> Pausar`;
+      }
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html>
